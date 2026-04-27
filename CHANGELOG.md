@@ -29,5 +29,5 @@ reconnection.
 - Unit tests covering the backoff curve, the mock layer, and coordinator
   reconnection/failure paths.
 
-[Unreleased]: https://github.com/your-org/SwiftBLEKit/compare/0.1.0...HEAD
-[0.1.0]: https://github.com/your-org/SwiftBLEKit/releases/tag/0.1.0
+[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/DeepakPal25/SwiftBLEKit/releases/tag/0.1.0

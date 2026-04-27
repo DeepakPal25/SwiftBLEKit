@@ -37,11 +37,32 @@ SwiftBLEKit/
 
 ## Installation
 
-Swift Package Manager:
+Swift Package Manager. Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/your-org/SwiftBLEKit.git", from: "0.1.0")
+dependencies: [
+    .package(url: "https://github.com/DeepakPal25/SwiftBLEKit.git", from: "0.1.0"),
+],
+targets: [
+    .target(
+        name: "YourApp",
+        dependencies: [
+            .product(name: "SwiftBLEKit", package: "SwiftBLEKit"),
+        ]
+    ),
+]
 ```
+
+Or in Xcode: **File ▸ Add Package Dependencies…** and enter
+`https://github.com/DeepakPal25/SwiftBLEKit.git`.
+
+> **Private repository.** Until this package is made public, consumers need
+> access to the repo. If Xcode/SPM prompts for credentials over HTTPS, either
+> sign in with a GitHub account that has access, or use the SSH URL
+> `git@github.com:DeepakPal25/SwiftBLEKit.git` with an SSH key configured for
+> GitHub.
+
+Then `import SwiftBLEKit` where you need it.
 
 ## Usage
 
