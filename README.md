@@ -87,6 +87,42 @@ for await discovery in central.scan(services: [.heartRate]) {
 }
 ```
 
+### Declarative GATT profiles
+
+Describe the services and characteristics you care about, and let `attach`
+handle discovery, subscription, and parsing:
+
+```swift
+let profile = GATTProfile {
+    service(.heartRate) {
+        characteristic(.heartRateMeasurement).notify { data in
+            // handle each measurement (raw bytes, or decode with `.notify(as:)`)
+        }
+    }
+    service(.batteryService) {
+        characteristic(.batteryLevel).read { data in
+            // read once on attach
+        }
+    }
+}
+
+// Retain the session for as long as you want notifications delivered.
+let session = try await peripheral.attach(profile)
+```
+
+Conform your payload types to `CharacteristicValue` to decode automatically:
+
+```swift
+struct BatteryLevel: CharacteristicValue {
+    let percent: Int
+    init(data: Data) throws { percent = Int(data.first ?? 0) }
+}
+
+characteristic(.batteryLevel).notify(as: BatteryLevel.self) { level in
+    print("battery:", level.percent)
+}
+```
+
 ### Testing without hardware
 
 The same code paths run against in-memory doubles:
