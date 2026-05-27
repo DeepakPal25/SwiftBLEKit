@@ -5,6 +5,26 @@ All notable changes to SwiftBLEKit are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.3.0]
+
+Standard GATT profiles: typed Swift models for the common assigned
+characteristics, shipped as `CharacteristicValue` conformances that drop
+straight into the DSL.
+
+### Added
+- **Typed characteristic models** — `BatteryLevel`, `HeartRateMeasurement`
+  (8/16-bit value, energy expended, RR intervals, sensor contact),
+  `BodySensorLocation`, `GATTString` (Device Information strings),
+  `CyclingPowerMeasurement` (instantaneous power + pedal balance), and
+  `HIDReport`.
+- **`StandardProfile`** — pre-built `ServiceSpec` factories
+  (`.battery`, `.heartRate`, `.cyclingPower`, `.deviceInformation`) that combine
+  the DSL with the typed models.
+- **`ByteReader`** — an internal bounds-checked little-endian payload cursor.
+- Assigned-number UUIDs for cycling power, HID report, and additional Device
+  Information fields.
+- Tests with spec byte-vectors for every model, plus a DSL integration test.
+
 ## [0.2.0]
 
 A declarative DSL for describing and consuming a peripheral's GATT services,
@@ -48,6 +68,7 @@ reconnection.
 - Unit tests covering the backoff curve, the mock layer, and coordinator
   reconnection/failure paths.
 
-[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/DeepakPal25/SwiftBLEKit/releases/tag/0.1.0

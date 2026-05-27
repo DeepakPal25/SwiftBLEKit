@@ -123,6 +123,32 @@ characteristic(.batteryLevel).notify(as: BatteryLevel.self) { level in
 }
 ```
 
+### Standard GATT profiles
+
+Typed models for the common assigned characteristics ship built in, so you never
+re-parse raw bytes for standard services. Use the pre-built `StandardProfile`
+factories, or the models directly via `.notify(as:)` / `.read(as:)`:
+
+```swift
+let profile = GATTProfile {
+    StandardProfile.heartRate { measurement in
+        print(measurement.beatsPerMinute, measurement.rrIntervals)
+    }
+    StandardProfile.battery { level in
+        print("battery:", level.percent)
+    }
+    StandardProfile.deviceInformation(
+        manufacturer: { print("made by", $0) },
+        firmware: { print("fw", $0) }
+    )
+}
+
+let session = try await peripheral.attach(profile)
+```
+
+Included models: `BatteryLevel`, `HeartRateMeasurement`, `BodySensorLocation`,
+`CyclingPowerMeasurement`, `GATTString` (Device Information), and `HIDReport`.
+
 ### Testing without hardware
 
 The same code paths run against in-memory doubles:

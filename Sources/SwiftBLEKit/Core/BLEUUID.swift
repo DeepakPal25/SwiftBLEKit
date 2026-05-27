@@ -47,5 +47,10 @@ extension BLEUUID {
     public static let bodySensorLocation: BLEUUID = "2A38"
     public static let manufacturerName: BLEUUID = "2A29"
     public static let modelNumber: BLEUUID = "2A24"
+    public static let serialNumber: BLEUUID = "2A25"
     public static let firmwareRevision: BLEUUID = "2A26"
+    public static let hardwareRevision: BLEUUID = "2A27"
+    public static let softwareRevision: BLEUUID = "2A28"
+    public static let cyclingPowerMeasurement: BLEUUID = "2A63"
+    public static let hidReport: BLEUUID = "2A4D"
 }
