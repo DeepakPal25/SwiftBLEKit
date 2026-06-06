@@ -28,6 +28,7 @@ public actor MockCentralManager: BLECentralManaging {
     private var stateContinuations: [AsyncStream<BLEManagerState>.Continuation] = []
     private var discoveryContinuations: [AsyncStream<BLEDiscovery>.Continuation] = []
     private var disconnectContinuations: [AsyncStream<BLEDisconnection>.Continuation] = []
+    private var restorationContinuations: [AsyncStream<BLERestorationState>.Continuation] = []
 
     public init(state: BLEManagerState = .poweredOn) {
         self._state = state
@@ -73,6 +74,15 @@ public actor MockCentralManager: BLECentralManaging {
 
     /// Whether a peripheral is currently considered connected.
     public func isConnected(_ identifier: UUID) -> Bool { connected.contains(identifier) }
+
+    /// Simulates iOS restoring the app with a set of peripherals, as if
+    /// `willRestoreState` had fired. The peripherals are registered so they can
+    /// be connected.
+    public func simulateRestoration(_ peripherals: [BLEPeripheralProtocol], scanServices: [BLEUUID] = []) {
+        for peripheral in peripherals { add(peripheral) }
+        let restoration = BLERestorationState(peripherals: peripherals, scanServices: scanServices)
+        for continuation in restorationContinuations { continuation.yield(restoration) }
+    }
 
     // MARK: - BLECentralManaging
 
@@ -125,6 +135,12 @@ public actor MockCentralManager: BLECentralManaging {
         peripherals[identifier]
     }
 
+    public nonisolated func restorationEvents() -> AsyncStream<BLERestorationState> {
+        AsyncStream { continuation in
+            Task { await self.registerRestorationContinuation(continuation) }
+        }
+    }
+
     // MARK: - Continuation registration
 
     private func registerStateContinuation(_ c: AsyncStream<BLEManagerState>.Continuation) {
@@ -138,5 +154,9 @@ public actor MockCentralManager: BLECentralManaging {
 
     private func registerDisconnectContinuation(_ c: AsyncStream<BLEDisconnection>.Continuation) {
         disconnectContinuations.append(c)
+    }
+
+    private func registerRestorationContinuation(_ c: AsyncStream<BLERestorationState>.Continuation) {
+        restorationContinuations.append(c)
     }
 }

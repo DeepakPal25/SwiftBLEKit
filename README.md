@@ -149,6 +149,25 @@ let session = try await peripheral.attach(profile)
 Included models: `BatteryLevel`, `HeartRateMeasurement`, `BodySensorLocation`,
 `CyclingPowerMeasurement`, `GATTString` (Device Information), and `HIDReport`.
 
+### State restoration
+
+Opt into Core Bluetooth state restoration and resume management when iOS
+relaunches your app in the background:
+
+```swift
+let central = LiveCentralManager(restoreIdentifier: "com.example.central")
+
+for await restoration in central.restorationEvents() {
+    for peripheral in restoration.peripherals {
+        let coordinator = ConnectionCoordinator(central: central, peripheral: peripheral)
+        await coordinator.start()
+    }
+}
+```
+
+In tests, drive it with `MockCentralManager.simulateRestoration(_:)` — no
+app-termination dance required.
+
 ### Testing without hardware
 
 The same code paths run against in-memory doubles:

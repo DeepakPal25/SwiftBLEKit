@@ -21,6 +21,10 @@ public final class LiveCentralManager: NSObject, BLECentralManaging, @unchecked 
     private var stateSinks: [AsyncStream<BLEManagerState>.Continuation] = []
     private var discoverySinks: [AsyncStream<BLEDiscovery>.Continuation] = []
     private var disconnectSinks: [AsyncStream<BLEDisconnection>.Continuation] = []
+    private var restorationSinks: [AsyncStream<BLERestorationState>.Continuation] = []
+    /// Buffers a restoration that arrived before any observer subscribed, since
+    /// `willRestoreState` fires very early in the relaunch.
+    private var pendingRestoration: BLERestorationState?
 
     /// Creates a live central.
     /// - Parameter restoreIdentifier: Pass a stable identifier to opt into
@@ -120,6 +124,17 @@ public final class LiveCentralManager: NSObject, BLECentralManaging, @unchecked 
         return livePeripheral(for: cbPeripheral)
     }
 
+    public func restorationEvents() -> AsyncStream<BLERestorationState> {
+        AsyncStream { continuation in
+            let pending = lock.guarded { () -> BLERestorationState? in
+                restorationSinks.append(continuation)
+                return pendingRestoration
+            }
+            // Deliver a restoration that arrived before this subscriber existed.
+            if let pending { continuation.yield(pending) }
+        }
+    }
+
     // MARK: - Private
 
     /// Resolves a `CBPeripheral` for a known identifier. Caller holds `lock`.
@@ -194,8 +209,17 @@ extension LiveCentralManager: CBCentralManagerDelegate {
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String: Any]) {
         // Re-register restored peripherals so reconnection can target them.
-        let restored = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] ?? []
-        for cbPeripheral in restored { _ = livePeripheral(for: cbPeripheral) }
+        let restoredCB = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] ?? []
+        let peripherals = restoredCB.map { livePeripheral(for: $0) }
+        let scanServices = (dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID])?
+            .map(BLEUUID.init) ?? []
+        let restoration = BLERestorationState(peripherals: peripherals, scanServices: scanServices)
+
+        let sinks = lock.guarded { () -> [AsyncStream<BLERestorationState>.Continuation] in
+            pendingRestoration = restoration
+            return restorationSinks
+        }
+        for sink in sinks { sink.yield(restoration) }
     }
 }
 

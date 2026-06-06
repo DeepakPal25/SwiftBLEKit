@@ -36,4 +36,13 @@ public protocol BLECentralManaging: AnyObject, Sendable {
     /// Retrieves a known peripheral by identifier without scanning — the basis
     /// for reconnecting to a remembered accessory.
     func retrievePeripheral(identifier: UUID) async -> BLEPeripheralProtocol?
+
+    /// A stream of Core Bluetooth state-restoration events.
+    ///
+    /// When iOS relaunches an app into the background to deliver a Bluetooth
+    /// event, it hands back the peripherals the previous process was using. Each
+    /// emitted ``BLERestorationState`` lets the app rebuild its connection state
+    /// (e.g. hand the peripherals to ``ConnectionCoordinator``s) without
+    /// re-scanning. Emits nothing on a normal launch.
+    func restorationEvents() -> AsyncStream<BLERestorationState>
 }

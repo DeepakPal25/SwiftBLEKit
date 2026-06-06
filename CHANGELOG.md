@@ -5,6 +5,21 @@ All notable changes to SwiftBLEKit are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.4.0]
+
+Core Bluetooth state restoration — a reference implementation of the notoriously
+fiddly `willRestoreState` flow, exposed through the same testable abstraction.
+
+### Added
+- **`BLERestorationState`** — the peripherals (and scan services) iOS hands back
+  when it relaunches the app for a Bluetooth event.
+- **`BLECentralManaging.restorationEvents()`** — an `AsyncStream` of restoration
+  events; `LiveCentralManager` buffers a restoration that arrives before any
+  observer subscribes (as it does very early in a background relaunch).
+- **`MockCentralManager.simulateRestoration(_:)`** — drive restoration in tests
+  and confirm restored peripherals are registered and reconnectable.
+- Tests covering restoration delivery and coordinator resumption.
+
 ## [0.3.0]
 
 Standard GATT profiles: typed Swift models for the common assigned
@@ -68,7 +83,8 @@ reconnection.
 - Unit tests covering the backoff curve, the mock layer, and coordinator
   reconnection/failure paths.
 
-[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/DeepakPal25/SwiftBLEKit/releases/tag/0.1.0
