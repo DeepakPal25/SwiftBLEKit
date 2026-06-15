@@ -14,5 +14,5 @@
 
 /// The library version, matching the current release tag.
 public enum SwiftBLEKit {
-    public static let version = "0.4.0"
+    public static let version = "0.5.0"
 }

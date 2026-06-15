@@ -168,6 +168,23 @@ for await restoration in central.restorationEvents() {
 In tests, drive it with `MockCentralManager.simulateRestoration(_:)` — no
 app-termination dance required.
 
+### Managing many devices
+
+`ConnectionPool` keeps many peripherals connected under a concurrency cap,
+queuing the excess and promoting by priority as slots free up:
+
+```swift
+let pool = ConnectionPool(central: central, maxConcurrent: 4)
+
+await pool.manage(sensorA, priority: 10)   // connects now
+await pool.manage(sensorB)                 // connects now
+// …beyond the cap, further peripherals wait until a slot frees.
+
+for await event in await pool.events() {
+    print(event.identifier, event.state)
+}
+```
+
 ### Testing without hardware
 
 The same code paths run against in-memory doubles:

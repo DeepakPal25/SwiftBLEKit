@@ -5,6 +5,20 @@ All notable changes to SwiftBLEKit are documented here. This project adheres to
 
 ## [Unreleased]
 
+## [0.5.0]
+
+Multi-device coordination — a connection pool that manages many peripherals
+under a practical concurrency cap.
+
+### Added
+- **`ConnectionPool`** — an actor that keeps at most `maxConcurrent`
+  ``ConnectionCoordinator``s running, queuing additional peripherals and
+  promoting them by priority as slots free up (on drop or terminal failure).
+- **`PoolEvent`** — a stream of `(identifier, ConnectionState)` changes across
+  all managed peripherals, plus `activeConnections` / `queuedCount` / `state(for:)`.
+- Tests covering the concurrency cap, priority promotion on drop, and slot
+  reclamation after a terminal failure.
+
 ## [0.4.0]
 
 Core Bluetooth state restoration — a reference implementation of the notoriously
@@ -83,7 +97,8 @@ reconnection.
 - Unit tests covering the backoff curve, the mock layer, and coordinator
   reconnection/failure paths.
 
-[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/DeepakPal25/SwiftBLEKit/compare/0.1.0...0.2.0

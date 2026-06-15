@@ -35,18 +35,18 @@ struct ConnectionPoolTests {
         await pool.manage(peripherals[1])
         await pool.manage(peripherals[2])
 
-        // Two connect, one waits.
-        #expect(await eventually { await pool.activeConnections == 2 })
+        // Two slots fill immediately; the third waits.
+        #expect(await pool.activeConnections == 2)
         #expect(await pool.queuedCount == 1)
 
-        let connectedCount = await withCheckedContinuation { c in
-            Task {
-                var n = 0
-                for p in peripherals where await pool.state(for: p.identifier) == .connected { n += 1 }
-                c.resume(returning: n)
+        // Exactly two peripherals should reach .connected.
+        #expect(await eventually {
+            var n = 0
+            for p in peripherals {
+                if await pool.state(for: p.identifier) == .connected { n += 1 }
             }
-        }
-        #expect(connectedCount == 2)
+            return n == 2
+        })
     }
 
     @Test("Promotes a queued peripheral when a slot frees")
@@ -83,9 +83,10 @@ struct ConnectionPoolTests {
         await central.add(failing)
         await central.add(next)
 
-        // First peripheral's connects all fail → coordinator reaches .failed.
+        // Exactly the 3 attempts the failing coordinator makes (initial + 2
+        // retries at maxAttempts: 2), so `next` still gets a clean connect.
         await central.enqueueConnectBehaviors(
-            Array(repeating: .fail(.underlying("no route")), count: 6)
+            Array(repeating: .fail(.underlying("no route")), count: 3)
         )
 
         await pool.manage(failing)
