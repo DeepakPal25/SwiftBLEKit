@@ -1,0 +1,9 @@
+# Swift Package Index build & documentation configuration.
+# https://swiftpackageindex.com/DeepakPal25/SwiftBLEKit
+version: 1
+builder:
+  configs:
+    - platform: ios
+      scheme: SwiftBLEKit
+      documentation_targets:
+        - SwiftBLEKit
