@@ -1,5 +1,11 @@
 # SwiftBLEKit
 
+[![CI](https://github.com/DeepakPal25/SwiftBLEKit/actions/workflows/ci.yml/badge.svg)](https://github.com/DeepakPal25/SwiftBLEKit/actions/workflows/ci.yml)
+[![Swift](https://img.shields.io/badge/Swift-6.2-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg)](https://github.com/DeepakPal25/SwiftBLEKit)
+[![SPM](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **The missing testable Core Bluetooth layer for Apple platforms.**
 
 Core Bluetooth is powerful but low-level: every BLE app re-implements the same
@@ -24,6 +30,26 @@ SwiftBLEKit/
   backoff and jitter, driven entirely against the abstraction.
 - **Testable end to end** — simulate discovery, connection drops, RSSI changes,
   reads/writes, and notifications in unit tests with zero hardware.
+
+## How it compares
+
+Most libraries solve one of these problems; SwiftBLEKit's angle is combining the
+testing seam, automatic reconnection, and a declarative GATT layer in one
+Swift-concurrency-native package.
+
+| | SwiftBLEKit | AsyncBluetooth | CoreBluetoothMock | SwiftBluetooth |
+| --- | :---: | :---: | :---: | :---: |
+| async/await native | ✅ | ✅ | — | ✅ |
+| Hardware-free test doubles | ✅ | — | ✅ | ✅ |
+| Automatic reconnection + backoff | ✅ | — | — | — |
+| Declarative GATT profile DSL | ✅ | — | — | — |
+| Typed standard-profile models | ✅ | partial | — | — |
+| Multi-device connection pool | ✅ | — | — | — |
+| State restoration helper | ✅ | — | — | — |
+
+*Comparison reflects each library's primary focus; the others are excellent at
+what they target — see [docs/TECHNICAL.md](docs/TECHNICAL.md) for an honest
+breakdown.*
 
 ## Requirements
 
@@ -215,8 +241,49 @@ import Testing
 `ConnectionCoordinator` takes an injectable `sleep` closure, so reconnection
 timing is fully deterministic under test — no waiting on real backoff delays.
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes and
-[CONTRIBUTING.md](CONTRIBUTING.md) to get involved.
+### Runnable demo
+
+A complete example runs the whole stack — connection coordinator, DSL, and typed
+profiles — against a simulated peripheral with **no Bluetooth radio**:
+
+```sh
+swift run HeartRateDemo
+```
+
+```
+SwiftBLEKit demo — simulated heart-rate monitor (no hardware)
+
+• connecting…
+• connected, streaming readings:
+
+  🔋 90%
+  ♥︎ 72 bpm
+  ♥︎ 74 bpm
+  …
+```
+
+Source: [Examples/HeartRateDemo](Examples/HeartRateDemo).
+
+## Project status
+
+SwiftBLEKit is at **0.5.0**. All five planned layers are implemented and covered
+by the test suite, and the public API is close to stable. Ahead of **1.0** we're:
+
+- hardening the `CoreBluetooth/` adapter against real-device edge cases,
+- finalizing API names (pre-1.0 minor releases may make small breaking changes,
+  documented in the [CHANGELOG](CHANGELOG.md)),
+- publishing DocC API docs and a runnable demo.
+
+Semantic versioning is followed: while `0.x`, breaking changes bump the minor
+version. Once the API has proven stable in real apps, it will be tagged `1.0.0`.
+
+## Documentation
+
+- [docs/TECHNICAL.md](docs/TECHNICAL.md) — a deep dive into how BLE connectivity
+  works, why SwiftBLEKit is architected the way it is, and a module-by-module
+  walkthrough of the whole stack.
+- [CHANGELOG.md](CHANGELOG.md) — release notes.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to get involved.
 
 ## License
 

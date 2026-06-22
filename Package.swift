@@ -28,5 +28,12 @@ let package = Package(
             name: "SwiftBLEKitTests",
             dependencies: ["SwiftBLEKit"]
         ),
+        // A runnable demo that streams a simulated heart-rate monitor with no
+        // hardware: `swift run HeartRateDemo`.
+        .executableTarget(
+            name: "HeartRateDemo",
+            dependencies: ["SwiftBLEKit"],
+            path: "Examples/HeartRateDemo"
+        ),
     ]
 )
